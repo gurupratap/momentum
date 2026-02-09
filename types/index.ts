@@ -1,7 +1,64 @@
-import type { Goal, User, FrequencyType, GoalStatus } from '@/app/generated/prisma/client'
+import type {
+  Habit,
+  User,
+  FrequencyType,
+  HabitStatus,
+  HabitInsight,
+  Question,
+  InsightStatus,
+  Goal,
+  GoalInsight,
+  GoalStatus,
+  GoalCategory
+} from '@/app/generated/prisma/client'
 
 // Re-export Prisma types
-export type { Goal, User, FrequencyType, GoalStatus }
+export type {
+  Habit,
+  User,
+  FrequencyType,
+  HabitStatus,
+  HabitInsight,
+  Question,
+  InsightStatus,
+  Goal,
+  GoalInsight,
+  GoalStatus,
+  GoalCategory
+}
+
+// Question option shape (matches JSON stored in Question.options)
+export type QuestionOption = {
+  key: string
+  text: string
+}
+
+// Suggested habit from AI
+export type SuggestedHabit = {
+  name: string
+  description: string
+  frequency: FrequencyType
+  frequencyTarget?: number | null
+  rationale: string
+  impact: 'high' | 'medium' | 'low'
+  difficulty: 'easy' | 'moderate' | 'challenging'
+}
+
+// Insight with questions for API responses
+export type HabitInsightWithQuestions = HabitInsight & {
+  questions: Question[]
+}
+
+// Goal with habits for API responses
+export type GoalWithHabits = Goal & {
+  habits: Habit[]
+  _count: { habits: number }
+}
+
+// Goal insight with suggestions
+export type GoalInsightWithSuggestions = GoalInsight & {
+  suggestions: SuggestedHabit[]
+}
 
 // API Response types
 export type ApiResponse<T> = {
@@ -9,34 +66,19 @@ export type ApiResponse<T> = {
   error?: string
 }
 
-// Goal form data (for creating/updating goals)
+// Goal form data (for creating goals)
 export type GoalFormData = {
   title: string
   description?: string
+  category?: GoalCategory
+  targetDate?: string
+}
+
+// Habit form data (for creating habits)
+export type HabitFormData = {
+  goalId: string
+  name: string
+  description?: string
   frequency: FrequencyType
   frequencyTarget?: number
-  startDate: Date
-  endDate?: Date
-  purpose: string
 }
-
-// Goal with user relation
-export type GoalWithUser = Goal & {
-  user: User
-}
-
-// Wizard step types
-export type WizardStep = 'details' | 'frequency' | 'timeline' | 'purpose'
-
-export type WizardState = {
-  currentStep: WizardStep
-  data: Partial<GoalFormData>
-  errors: Partial<Record<keyof GoalFormData, string>>
-}
-
-export type WizardAction =
-  | { type: 'SET_FIELD'; field: keyof GoalFormData; value: unknown }
-  | { type: 'SET_ERRORS'; errors: Partial<Record<keyof GoalFormData, string>> }
-  | { type: 'NEXT_STEP' }
-  | { type: 'PREV_STEP' }
-  | { type: 'RESET' }

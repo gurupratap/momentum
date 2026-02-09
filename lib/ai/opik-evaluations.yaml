@@ -1,0 +1,287 @@
+evaluations:
+- name: goal_understanding_accuracy
+  description: Does the agent correctly extract the user's core goal and intent from the user's message?
+  type: llm_judge
+  model: gpt-4
+  prompt: 'You are an expert user-intent analyst. The user message contains a stated goal and context; the AGENT has produced
+    an AI analysis of that goal. Compare them and decide if the agent captured the user''s core intent accurately.
+
+    Consider:
+
+    - Is the stated goal represented correctly (no hallucinated goals)?
+
+    - Are important constraints (time, medical, equipment, motivations) captured?
+
+    - Did the agent add assumptions not in input?
+
+    Provide a numeric accuracy score 1-10 and list up to 3 concrete errors or omissions (or "None").
+
+
+    USER GOAL + CONTEXT:
+
+    {{input}}
+
+
+    AGENT ANALYSIS:
+
+    {{output}}
+
+
+    EVALUATION FORMAT:
+
+    Accuracy Score: [1-10]
+
+    Errors/Omissions: [Comma-separated list or "None"]
+
+    '
+  scoring:
+    type: numeric
+    min: 1
+    max: 10
+  metadata:
+    category: accuracy
+    importance: critical
+- name: goal_actionability_and_clarity
+  description: Is the agent's analysis written in an actionable way that leads naturally into habit suggestions?
+  type: llm_judge
+  model: gpt-4
+  prompt: 'You are a product designer evaluating analysis outputs for downstream action. Rate how well the agent''s analysis
+    sets up concrete habit recommendations.
+
+    Consider:
+
+    - Clear problem framing
+
+    - Identified levers or behaviors to change
+
+    - Prioritized next steps (what to try first)
+
+    Provide:
+
+    - Actionability Score (1-10)
+
+    - One-line recommended next immediate action for the habit engine to take (e.g., ''Propose 3 daily 10-minute habits focusing
+    on X'').
+
+
+    USER GOAL + CONTEXT:
+
+    {{input}}
+
+
+    AGENT ANALYSIS:
+
+    {{output}}
+
+
+    EVALUATION FORMAT:
+
+    Actionability Score: [1-10]
+
+    Recommended Next Action: [one short sentence]
+
+    '
+  scoring:
+    type: numeric
+    min: 1
+    max: 10
+  metadata:
+    category: product
+    importance: high
+- name: habit_overview_goal_alignment
+  description: Does the habit AI overview correctly reflect the user's goal and the intent behind the recommended habits?
+  type: llm_judge
+  model: gpt-4
+  prompt: 'You are an expert product reviewer. Compare the USER GOAL and HABITS with the AI OVERVIEW text.
+
+    Evaluate whether the overview accurately explains:
+
+    - The user''s original goal
+
+    - Why these habits were chosen for that goal
+
+    - Without introducing new or incorrect goals
+
+
+    USER GOAL + CONTEXT + HABITS:
+
+    {{input}}
+
+
+    AI OVERVIEW:
+
+    {{output}}
+
+
+    EVALUATION FORMAT:
+
+    Alignment Score: [1-10]
+
+    Issues: [Comma-separated list or "None"]
+
+    '
+  scoring:
+    type: numeric
+    min: 1
+    max: 10
+  metadata:
+    category: accuracy
+    importance: critical
+- name: habit_overview_clarity
+  description: Evaluates whether the overview is easy to understand and cognitively lightweight.
+  type: llm_judge
+  model: gpt-4
+  prompt: 'You are a UX writing expert. Evaluate the AI OVERVIEW for:
+
+    - Plain language
+
+    - Logical flow
+
+    - Absence of jargon
+
+    - Appropriate length for a quick read
+
+
+    AI OVERVIEW:
+
+    {{output}}
+
+
+    EVALUATION FORMAT:
+
+    Clarity Score: [1-10]
+
+    Improvement Suggestion: [One short sentence or "None"]
+
+    '
+  scoring:
+    type: numeric
+    min: 1
+    max: 10
+  metadata:
+    category: ux
+    importance: high
+- name: habit_relevance_personalization
+  description: Does the suggested habit map clearly to the user's stated goal and personal context?
+  type: llm_judge
+  model: gpt-4
+  prompt: 'You are an expert behavior-change coach. Assess whether the suggested habit(s) directly support the user''s stated
+    goal and are tailored to the user''s context.
+
+    Consider:
+
+    - Explicit alignment: how directly the habit maps to the goal
+
+    - Personalization: references to user preferences, constraints, or profile
+
+    - Focus: whether the habit avoids mission-creep (too broad/unrelated)
+
+    Rate 1-10 and give a single-line rationale.
+
+
+    USER INPUT:
+
+    {{input}}
+
+
+    AGENT OUTPUT:
+
+    {{output}}
+
+
+    EVALUATION FORMAT:
+
+    Relevance Score: [1-10]
+
+    Rationale: [One short sentence]
+
+    '
+  scoring:
+    type: numeric
+    min: 1
+    max: 10
+  metadata:
+    category: relevance
+    importance: critical
+- name: habit_personal_motivation_alignment
+  description: How well does the habit leverage the user's intrinsic/extrinsic motivators described in input?
+  type: llm_judge
+  model: gpt-4
+  prompt: 'You are a motivational psychologist. Evaluate how well the habit aligns with the user''s stated motivators (health/savings/social/status/fun/curiosity).
+    Consider sustainability driven by intrinsic motivators vs fragile extrinsic ones.
+
+    Rate alignment 1-10 and state the primary motivator used.
+
+
+    USER INPUT:
+
+    {{input}}
+
+
+    AGENT OUTPUT:
+
+    {{output}}
+
+
+    EVALUATION FORMAT:
+
+    Motivation Alignment Score: [1-10]
+
+    Primary Motivator: [short phrase]
+
+    '
+  scoring:
+    type: numeric
+    min: 1
+    max: 10
+  metadata:
+    category: motivation
+    importance: medium
+- name: habit_adoption_likelihood
+  description: Predict the user's likelihood to adopt and sustain the habit (30-day adherence probability). Useful as an eval
+    for A/Bing prompts.
+  type: llm_judge
+  model: gpt-4
+  prompt: 'You are an evidence-based behavior scientist. Given user profile/context and suggested habit, estimate the probability
+    that the user will follow the habit for 30 days (0-100%). Consider specificity, feasibility, personalization, time constraints,
+    and clearly stated rewards/costs.
+
+    Provide a numeric percent and one sentence explaining the biggest weakness reducing adoption.
+
+
+    USER INPUT:
+
+    {{input}}
+
+
+    AGENT OUTPUT:
+
+    {{output}}
+
+
+    EVALUATION FORMAT:
+
+    30d Adherence Probability: [0-100]%
+
+    Biggest Weakness: [One sentence]
+
+    '
+  scoring:
+    type: numeric
+    min: 0
+    max: 100
+  metadata:
+    category: adoption
+    importance: high
+notes:
+- Filtered to include only numeric, percentage, and composite scoring types (removed 14 categorical evaluations)
+- When using llm_judge evaluations, prefer a stable model version for comparability across runs.
+- Surface the raw LLM evaluation outputs in logs so you can inspect edge cases (don't only store numeric scores).
+- Use simulated_user_acceptance_test with multiple personas (busy parent, student, remote worker, office professional) to
+  increase robustness.
+- 'For prompt_quality_for_agent, automate A/B runs: run candidates through the prompt_quality eval and the overall_quality_composite
+  to prioritize prompt edits that improve both.'
+- Track distribution changes over time — e.g., average adoption probability and safety flags — to detect regressions after
+  model/prompt updates.
+- JSON robustness scores are computed locally and logged to metadata. Monitor json_robustnessScore, json_repairCount, and
+  json_repairSteps for model/prompt quality.

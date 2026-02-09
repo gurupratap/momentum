@@ -1,8 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   reactCompiler: true,
+  serverExternalPackages: ["opik"],
+  output: "standalone", // Enable Docker support
 };
 
 export default nextConfig;

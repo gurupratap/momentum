@@ -1,7 +1,7 @@
 import { type HTMLAttributes } from 'react'
 import { cn } from '@/lib/utils/cn'
 
-interface CardProps extends HTMLAttributes<HTMLDivElement> {}
+type CardProps = HTMLAttributes<HTMLDivElement>
 
 export function Card({ className, children, ...props }: CardProps) {
   return (
@@ -17,7 +17,7 @@ export function Card({ className, children, ...props }: CardProps) {
   )
 }
 
-interface CardHeaderProps extends HTMLAttributes<HTMLDivElement> {}
+type CardHeaderProps = HTMLAttributes<HTMLDivElement>
 
 export function CardHeader({ className, children, ...props }: CardHeaderProps) {
   return (
@@ -30,7 +30,7 @@ export function CardHeader({ className, children, ...props }: CardHeaderProps) {
   )
 }
 
-interface CardTitleProps extends HTMLAttributes<HTMLHeadingElement> {}
+type CardTitleProps = HTMLAttributes<HTMLHeadingElement>
 
 export function CardTitle({ className, children, ...props }: CardTitleProps) {
   return (
@@ -43,7 +43,7 @@ export function CardTitle({ className, children, ...props }: CardTitleProps) {
   )
 }
 
-interface CardContentProps extends HTMLAttributes<HTMLDivElement> {}
+type CardContentProps = HTMLAttributes<HTMLDivElement>
 
 export function CardContent({ className, children, ...props }: CardContentProps) {
   return (
@@ -53,7 +53,7 @@ export function CardContent({ className, children, ...props }: CardContentProps)
   )
 }
 
-interface CardFooterProps extends HTMLAttributes<HTMLDivElement> {}
+type CardFooterProps = HTMLAttributes<HTMLDivElement>
 
 export function CardFooter({ className, children, ...props }: CardFooterProps) {
   return (

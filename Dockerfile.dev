@@ -1,0 +1,25 @@
+# Development Dockerfile with Hot Reload
+FROM node:20-alpine AS development
+
+# Install dependencies for Prisma
+RUN apk add --no-cache libc6-compat openssl
+
+WORKDIR /app
+
+# Copy dependency files
+COPY package.json package-lock.json* ./
+
+# Install ALL dependencies (including dev)
+RUN npm install --legacy-peer-deps
+
+# Copy application code (will be overridden by volume mount)
+COPY . .
+
+# Generate Prisma client
+RUN npx prisma generate
+
+# Expose port
+EXPOSE 3000
+
+# Start development server (will be overridden by docker-compose command)
+CMD ["npm", "run", "dev"]

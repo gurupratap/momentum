@@ -8,33 +8,67 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
   name      String?
+  habits    Habit[]
   goals     Goal[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model Goal {
+model Habit {
   id              String        @id @default(cuid())
   userId          String
   user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  title           String
+  goalId          String?
+  goal            Goal?         @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  name            String
   description     String?
+  oldGoal         String?
   frequency       FrequencyType
   frequencyTarget Int?
   startDate       DateTime      @default(now())
-  endDate         DateTime?
-  purpose         String
-  status          GoalStatus    @default(ACTIVE)
+  status          HabitStatus   @default(ACTIVE)
+  isAiSuggested   Boolean       @default(false)
+  insight         HabitInsight?
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 
   @@index([userId])
+  @@index([goalId])
+}
+
+model HabitInsight {
+  id           String        @id @default(cuid())
+  habitId      String        @unique
+  habit        Habit         @relation(fields: [habitId], references: [id], onDelete: Cascade)
+  status       InsightStatus @default(PENDING)
+  research     String?
+  opikTraceId  String?
+  errorMessage String?
+  questions    Question[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Question {
+  id             String       @id @default(cuid())
+  insightId      String
+  insight        HabitInsight @relation(fields: [insightId], references: [id], onDelete: Cascade)
+  order          Int
+  questionText   String
+  options        Json
+  selectedOption String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([insightId, order])
+  @@index([insightId])
 }
 
 enum FrequencyType {
@@ -43,10 +77,67 @@ enum FrequencyType {
   CUSTOM
 }
 
-enum GoalStatus {
-  DRAFT
+enum HabitStatus {
   ACTIVE
   PAUSED
   COMPLETED
+  ABANDONED
+}
+
+enum InsightStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+model Goal {
+  id          String        @id @default(cuid())
+  userId      String
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  category    GoalCategory? @default(OTHER)
+  status      GoalStatus    @default(ACTIVE)
+  targetDate  DateTime?
+  habits      Habit[]
+  insight     GoalInsight?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([userId])
+  @@index([userId, status])
+}
+
+model GoalInsight {
+  id           String        @id @default(cuid())
+  goalId       String        @unique
+  goal         Goal          @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  status       InsightStatus @default(PENDING)
+  analysis     String?
+  suggestions  Json?
+  opikTraceId  String?
+  errorMessage String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+enum GoalCategory {
+  HEALTH
+  FITNESS
+  PRODUCTIVITY
+  LEARNING
+  MINDFULNESS
+  RELATIONSHIPS
+  CAREER
+  FINANCE
+  PERSONAL
+  OTHER
+}
+
+enum GoalStatus {
+  ACTIVE
+  PAUSED
+  ACHIEVED
   ABANDONED
 }
