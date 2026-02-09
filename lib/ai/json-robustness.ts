@@ -227,6 +227,11 @@ export function finalizeJSONParseMetrics(
  * Analyze semantic quality of parsed data
  */
 function analyzeSemanticQuality(metrics: JSONParseMetrics, data: unknown): void {
+  // Type guard: ensure data is an object
+  if (typeof data !== 'object' || data === null) {
+    return
+  }
+
   // Check for empty required fields
   const hasEmpty = checkForEmptyFields(data)
   metrics.hasEmptyRequiredFields = hasEmpty
@@ -239,23 +244,24 @@ function analyzeSemanticQuality(metrics: JSONParseMetrics, data: unknown): void 
   const completeness = calculateFieldCompleteness(data)
   metrics.fieldCompleteness = completeness
 
+  // Cast to record for property access
+  const record = data as Record<string, unknown>
+
   // Track array lengths for goal suggestions
-  if (data.suggestedHabits && Array.isArray(data.suggestedHabits)) {
-    metrics.finalArrayLengths = { suggestedHabits: data.suggestedHabits.length }
+  if (record.suggestedHabits && Array.isArray(record.suggestedHabits)) {
+    metrics.finalArrayLengths = { suggestedHabits: record.suggestedHabits.length }
   }
 
   // Track word count for analysis text
-  if (data.analysis && typeof data.analysis === 'string') {
-    metrics.finalWordCount = data.analysis.split(/\s+/).filter((w: string) => w.length > 0).length
+  if (record.analysis && typeof record.analysis === 'string') {
+    metrics.finalWordCount = record.analysis.split(/\s+/).filter((w: string) => w.length > 0).length
   }
-  if (data.research && typeof data.research === 'string') {
-    metrics.finalWordCount = data.research.split(/\s+/).filter((w: string) => w.length > 0).length
+  if (record.research && typeof record.research === 'string') {
+    metrics.finalWordCount = record.research.split(/\s+/).filter((w: string) => w.length > 0).length
   }
 
   // Count top-level fields
-  if (typeof data === 'object' && data !== null) {
-    metrics.finalObjectSize = Object.keys(data).length
-  }
+  metrics.finalObjectSize = Object.keys(data).length
 }
 
 /**
