@@ -64,7 +64,7 @@ export async function analyzeHabit(habitId: string): Promise<void> {
     const result = await generateText({
       model,
       prompt,
-      maxOutputTokens: MAX_TOKENS,
+      ...(MAX_TOKENS && { maxOutputTokens: MAX_TOKENS }),
       temperature: TEMPERATURE,
     })
 

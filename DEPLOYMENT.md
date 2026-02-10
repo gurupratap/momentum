@@ -48,9 +48,9 @@ vercel env add OPIK_API_KEY
 vercel env add OPIK_WORKSPACE
 
 # AI Configuration (optional, has defaults)
-vercel env add AI_MODEL_ID
-vercel env add AI_MODEL_TEMPERATURE
-vercel env add AI_MODEL_MAX_TOKENS
+vercel env add AI_MODEL_ID              # Default: gemini-2.0-flash-exp
+vercel env add AI_MODEL_TEMPERATURE     # Default: 0.3
+vercel env add AI_MODEL_MAX_TOKENS      # Optional: Set to limit max tokens (default: unlimited)
 
 # If using external database (not Vercel Postgres)
 vercel env add DATABASE_URL
