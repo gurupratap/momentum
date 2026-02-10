@@ -77,11 +77,31 @@ The build process will:
 3. Run database migrations (`prisma migrate deploy`)
 4. Build Next.js app
 
-## Step 4: Verify Deployment
+## Step 4: Configure StackAuth for Your Domain
 
-After deployment:
+**IMPORTANT:** Before testing, you must whitelist your Vercel URL in StackAuth:
+
+1. Go to [Stack Auth Dashboard](https://app.stack-auth.com)
+2. Select your project
+3. Navigate to **Settings** → **Domains** (or **URLs**)
+4. Add your Vercel deployment URL:
+   ```
+   https://your-app-name.vercel.app
+   ```
+5. Add OAuth callback URLs (if required):
+   ```
+   https://your-app-name.vercel.app/handler/oauth/callback
+   https://your-app-name.vercel.app/handler/sign-in
+   https://your-app-name.vercel.app/handler/sign-up
+   ```
+
+**Note:** You'll get a "REDIRECT_URL_NOT_WHITELISTED" error if you skip this step.
+
+## Step 5: Verify Deployment
+
+After deployment and StackAuth configuration:
 1. Visit the URL provided by Vercel
-2. Test authentication (StackAuth)
+2. Test authentication (StackAuth login/signup should work)
 3. Create a test goal
 4. Verify AI analysis works
 
@@ -100,8 +120,16 @@ After deployment:
 - Check API key has sufficient quota
 
 ### Authentication issues
-- Verify all STACK_* environment variables are set
+
+**Error: "REDIRECT_URL_NOT_WHITELISTED"**
+- Go to Stack Auth Dashboard → Settings → Domains
+- Add your Vercel URL to trusted domains
+- Add callback URLs as shown in Step 4 above
+
+**Other auth issues:**
+- Verify all STACK_* environment variables are set in Vercel
 - Check StackAuth dashboard for configuration
+- Ensure environment variables are set for the correct environment (production/preview)
 
 ## Continuous Deployment
 

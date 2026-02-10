@@ -68,8 +68,16 @@ export async function POST(request: NextRequest) {
     },
   })
 
+  console.log(`[goals/POST] Created goal ${goal.id}, triggering background analysis`)
+
   after(async () => {
-    await analyzeGoal(goal.id)
+    console.log(`[goals/POST after] Starting background analysis for goal ${goal.id}`)
+    try {
+      await analyzeGoal(goal.id)
+      console.log(`[goals/POST after] Completed analysis for goal ${goal.id}`)
+    } catch (error) {
+      console.error(`[goals/POST after] Failed analysis for goal ${goal.id}:`, error)
+    }
   })
 
   return NextResponse.json({ data: goal }, { status: 201 })
